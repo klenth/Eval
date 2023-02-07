@@ -1,0 +1,11 @@
+print("Welcome to Pythag!")
+print()
+
+a = input("Enter one leg: ")
+b = input("Enter the other leg: ")
+
+c = sqrt(a^2 + b^2)
+
+print("The hypotenuse is ", c)
+
+print("Have a nice day!")
