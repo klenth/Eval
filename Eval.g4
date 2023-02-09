@@ -1,37 +1,110 @@
 grammar Eval;
 
+@parser::header {
+import edu.westminstercollege.cmpt355.eval.node.*;
+}
+
 program
-    : statement* EOF
+returns [Program n]
+    : (stmts+=statement)* EOF {
+        var statements = new ArrayList<Statement>();
+        // Write code that iterates over $stmts (a List<StatementContext>)
+        // pull out each one's .n, and add it to statements.
+        // Method 1: for loop with counter
+        /*
+        for (int i = 0; i < $stmts.size(); ++i)
+            statements.add($stmts.get(i).n);
+        */
+
+        // Method 2: for-each loop
+        for (var stmt : $stmts)
+            statements.add(stmt.n);
+
+        // Method 3: using Java's Streams API (will require an additional import)
+        //statements = $stmts.stream().map(stmt -> stmt.n).collect(Collectors.toList());
+
+        $n = new Program(statements);
+    }
     ;
 
 statement
-    : print
-    | assignment
+returns [Statement n]
+    : print {
+        $n = $print.n;
+    }
+    | assignment {
+        $n = $assignment.n;
+    }
     ;
 
 print
-    : 'print' '(' (printArgument (',' printArgument)*)? ')'
+returns [Print n]
+    : 'print' '(' (args+=printArgument (',' args+=printArgument)*)? ')' {
+        var arguments = new ArrayList<PrintArgument>();
+        for (var arg : $args)
+            arguments.add(arg.n);
+        $n = new Print(arguments);
+    }
     ;
 
 printArgument
-    : STRING
-    | expr
+returns [PrintArgument n]
+    : STRING {
+        $n = new StringArgument($STRING.text);
+    }
+    | expr {
+        $n = $expr.n;
+    }
     ;
 
 assignment
-    : NAME '=' expr
+returns [Assignment n]
+    : NAME '=' expr {
+        $n = new Assignment($NAME.text, $expr.n);
+    }
     ;
 
 expr
-    : NAME
-    | NUMBER
-    | '(' expr ')'
-    | expr '^' expr
-    | ('+' | '-') expr
-    | expr ('*' | '/') expr
-    | expr ('+' | '-') expr
-    | 'input' '(' (printArgument (',' printArgument)*)? ')'
-    | NAME '(' expr ')'
+returns [Expression n]
+    : NAME {
+        $n = new VariableAccess($NAME.text);
+    }
+    | NUMBER {
+        $n = new Literal($NUMBER.text);
+    }
+    | '(' expr ')' {
+        $n = $expr.n;
+    }
+    | l=expr '^' r=expr {
+        $n = new Power($l.n, $r.n);
+    }
+    | op=('+' | '-') expr {
+        if ($op.text.equals("+"))
+            $n = $expr.n;
+        else
+            $n = new Negate($expr.n);
+    }
+    | l=expr op=('*' | '/') r=expr {
+        if ($op.text.equals("*"))
+            $n = new Multiply($l.n, $r.n);
+        else
+            $n = new Divide($l.n, $r.n);
+    }
+    | l=expr op=('+' | '-') r=expr {
+        if ($op.text.equals("+"))
+            $n = new Add($l.n, $r.n);
+        else
+            $n = new Subtract($l.n, $r.n);
+    }
+    | 'input' '(' (args+=printArgument (',' args+=printArgument)*)? ')' {
+        var arguments = new ArrayList<PrintArgument>();
+        for (var arg : $args)
+            arguments.add(arg.n);
+        $n = new Input(arguments);
+    }
+    | NAME '(' expr ')' {
+        $n = $expr.n;
+    }
     ;
 
 NAME

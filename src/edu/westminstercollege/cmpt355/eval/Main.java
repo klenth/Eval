@@ -18,19 +18,17 @@ public class Main {
         var lexer = new EvalLexer(CharStreams.fromFileName(EVAL_FILE));
         var parser = new EvalParser(new CommonTokenStream(lexer));
 
-        /*
         var program = parser.program().n;
         AST.print(program);
 
         /*
-        final String className = "Quadratic";
-        var compiler = new Compiler(program, "Quadratic");
+        var compiler = new Compiler(program, CLASS_NAME);
         compiler.addDefaultSymbols();
         compiler.compile(Path.of("test_output"));
 
         jasmin.Main.main(new String[] {
                 "-d", "out/test_compiled",
-                String.format("test_output/%s.j", className)
+                String.format("test_output/%s.j", CLASS_NAME)
         });
         // */
     }
