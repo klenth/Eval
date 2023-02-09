@@ -1,2 +1,5 @@
+/out/test_compiled/*.class
 /test_output/*.j
-/test_output/*.class
+/gen/**/*.java
+/gen/**/*.interp
+/gen/**/*.tokens

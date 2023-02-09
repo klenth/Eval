@@ -5,17 +5,40 @@ import org.antlr.v4.runtime.CommonTokenStream;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.regex.Pattern;
 
 public class Main {
 
     public static void main(String... args) throws IOException, SyntaxException {
-        var lexer = new EvalLexer(CharStreams.fromFileName("test_programs/hello.eval"));
+        final String EVAL_FILE = "test_programs/hello.eval";
+        final String CLASS_NAME = getClassNameFromPath(EVAL_FILE);
+
+        System.out.printf("Compiling class %s from %s...\n", CLASS_NAME, EVAL_FILE);
+
+        var lexer = new EvalLexer(CharStreams.fromFileName(EVAL_FILE));
         var parser = new EvalParser(new CommonTokenStream(lexer));
 
-        // Uncomment after AST building is done
         /*
         var program = parser.program().n;
         AST.print(program);
-         */
+
+        /*
+        final String className = "Quadratic";
+        var compiler = new Compiler(program, "Quadratic");
+        compiler.addDefaultSymbols();
+        compiler.compile(Path.of("test_output"));
+
+        jasmin.Main.main(new String[] {
+                "-d", "out/test_compiled",
+                String.format("test_output/%s.j", className)
+        });
+        // */
+    }
+
+    private static String getClassNameFromPath(String path) {
+        Path p = Path.of(path);
+        String filename = p.getFileName().toString();
+        int index = filename.indexOf('.');
+        return filename.substring(0, index);
     }
 }
