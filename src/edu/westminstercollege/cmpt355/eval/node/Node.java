@@ -2,7 +2,8 @@ package edu.westminstercollege.cmpt355.eval.node;
 
 import java.util.List;
 
-public interface Node {
+public sealed interface Node
+    permits PrintArgument, Statement, Program {
 
     default String getNodeDescription() {
         String fullName = getClass().getSimpleName();
