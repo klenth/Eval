@@ -1,5 +1,7 @@
 package edu.westminstercollege.cmpt355.eval;
 
+import edu.westminstercollege.cmpt355.eval.node.*;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -8,7 +10,6 @@ import java.nio.file.Path;
 public class Compiler {
 
     // Commented out until we have our AST nodes defined...
-    /*
     private SymbolTable symbols = new SymbolTable();
     private PrintWriter out;
     private final Program program;
@@ -61,8 +62,13 @@ public class Compiler {
      private void resolveSymbols(Program program) throws SyntaxException {
         AST.preOrder(program, node -> {
             switch (node) {
-                default ->
-                    throw new RuntimeException(String.format("Unimplemented: %s", node.getNodeDescription());
+                case Assignment(String name, Expression e) -> symbols.registerVariable(name);
+                case VariableAccess(String name) -> {
+                    if (symbols.findVariable(name).isEmpty())
+                        // No variable found!
+                        throw new SyntaxException(String.format("Variable used before assignment: %s", name));
+                }
+                default -> {}
             }
         });
     }
@@ -70,21 +76,21 @@ public class Compiler {
     private void generateCode(Statement statement) {
         switch (statement) {
             default ->
-                    throw new RuntimeException(String.format("Unimplemented: %s", node.getNodeDescription());
+                    throw new RuntimeException(String.format("Unimplemented: %s", statement.getNodeDescription()));
         }
     }
 
     private void generateCode(PrintArgument argument) {
         switch (argument) {
             default ->
-                    throw new RuntimeException(String.format("Unimplemented: %s", node.getNodeDescription());
+                    throw new RuntimeException(String.format("Unimplemented: %s", argument.getNodeDescription()));
         }
     }
 
     private void generateCode(Expression expr) {
         switch (expr) {
             default ->
-                    throw new RuntimeException(String.format("Unimplemented: %s", node.getNodeDescription());
+                    throw new RuntimeException(String.format("Unimplemented: %s", expr.getNodeDescription()));
         }
     }
 

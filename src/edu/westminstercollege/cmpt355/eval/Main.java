@@ -21,11 +21,10 @@ public class Main {
         var program = parser.program().n;
         AST.print(program);
 
-        /*
         var compiler = new Compiler(program, CLASS_NAME);
-        compiler.addDefaultSymbols();
         compiler.compile(Path.of("test_output"));
 
+        /*
         jasmin.Main.main(new String[] {
                 "-d", "out/test_compiled",
                 String.format("test_output/%s.j", CLASS_NAME)
