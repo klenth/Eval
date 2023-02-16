@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 public class Compiler {
 
@@ -46,10 +47,16 @@ public class Compiler {
                     """, className);
             out.printf(".method public static main([Ljava/lang/String;)V\n");
             out.printf(".limit stack 100\n");
+            out.printf(".limit locals 1\n");
             //out.printf(".limit locals %d\n", symbols.getVariableCount() * 2 + 1); // + 1 because of args
             out.println();
 
             // Generate code for program here 🙂
+            // Generate code for each statement of the program
+            for (var statement : program.statements())
+                generateCode(statement);
+
+            //program.statements().forEach(this::generateCode);
 
             out.printf("return\n");
             out.printf(".end method\n");
@@ -75,6 +82,15 @@ public class Compiler {
 
     private void generateCode(Statement statement) {
         switch (statement) {
+            case Print(List<PrintArgument> args) -> {
+                // Print each argument individually (using generateCode(PrintArgument))
+                // then do a println.
+                for (var arg : args)
+                    generateCode(arg);
+                //args.forEach(this::generateCode);
+                out.println("getstatic java/lang/System/out Ljava/io/PrintStream;");
+                out.println("invokevirtual java/io/PrintStream/println()V");
+            }
             default ->
                     throw new RuntimeException(String.format("Unimplemented: %s", statement.getNodeDescription()));
         }
@@ -82,13 +98,24 @@ public class Compiler {
 
     private void generateCode(PrintArgument argument) {
         switch (argument) {
-            default ->
-                    throw new RuntimeException(String.format("Unimplemented: %s", argument.getNodeDescription()));
+            case Expression e -> {
+                out.println("getstatic java/lang/System/out Ljava/io/PrintStream;");
+                generateCode(e);
+                out.println("invokevirtual java/io/PrintStream/print(D)V");
+            }
+            case StringArgument(String text) -> {
+                out.println("getstatic java/lang/System/out Ljava/io/PrintStream;");
+                out.printf("ldc %s\n", text);
+                out.println("invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V");
+            }
         }
     }
 
     private void generateCode(Expression expr) {
         switch (expr) {
+            case Literal(String text) -> {
+                out.printf("ldc2_w %f\n", Double.parseDouble(text));
+            }
             default ->
                     throw new RuntimeException(String.format("Unimplemented: %s", expr.getNodeDescription()));
         }
