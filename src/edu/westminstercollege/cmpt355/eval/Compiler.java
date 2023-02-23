@@ -116,6 +116,47 @@ public class Compiler {
             case Literal(String text) -> {
                 out.printf("ldc2_w %f\n", Double.parseDouble(text));
             }
+            case Add(Expression left, Expression right) -> {
+                generateCode(left);
+                generateCode(right);
+                out.println("dadd");
+            }
+            case Subtract(Expression left, Expression right) -> {
+                generateCode(left);
+                generateCode(right);
+                out.println("dsub");
+            }
+            case Multiply(Expression left, Expression right) -> {
+                generateCode(left);
+                generateCode(right);
+                out.println("dmul");
+            }
+            case Divide(Expression left, Expression right) -> {
+                generateCode(left);
+                generateCode(right);
+                out.println("ddiv");
+            }
+            case Negate(Expression child) -> {
+                generateCode(child);
+                out.println("dneg");
+            }
+            case SquareRoot(Expression child) -> {
+                generateCode(child);
+                // Call the Math.sqrt() method
+                out.println("invokestatic java/lang/Math/sqrt(D)D");
+            }
+            case Power(Expression left, Expression right) -> {
+                generateCode(left);
+                generateCode(right);
+                out.println("invokestatic java/lang/Math/pow(DD)D");
+            }
+            case VariableAccess(String variableName) -> {
+                Variable v = symbols.findVariable(variableName).get();
+                out.printf("dload %d\n", v.getIndex());
+            }
+
+            // Variable access
+            // Input
             default ->
                     throw new RuntimeException(String.format("Unimplemented: %s", expr.getNodeDescription()));
         }

@@ -75,7 +75,7 @@ returns [Expression n]
     | '(' expr ')' {
         $n = $expr.n;
     }
-    | l=expr '^' r=expr {
+    | <assoc=right> l=expr '^' r=expr {
         $n = new Power($l.n, $r.n);
     }
     | op=('+' | '-') expr {
@@ -102,8 +102,11 @@ returns [Expression n]
             arguments.add(arg.n);
         $n = new Input(arguments);
     }
-    | NAME '(' expr ')' {
+    | '(' expr ')' {
         $n = $expr.n;
+    }
+    | 'sqrt' '(' expr ')' {
+        $n = new SquareRoot($expr.n);
     }
     ;
 

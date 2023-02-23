@@ -1,2 +1,5 @@
 print("Hello, Eval world!")
 print("The current year is ", 2023)
+print("(5 + 9) / (3 * 2 - 4) = ", (5 + 9) / (3 * 2 - 4))
+print("The square roots of 9 are ", sqrt(9), " and ", -sqrt(9))
+print("2^2^3 = ", 2^2^3)
