@@ -23,4 +23,8 @@ public class SymbolTable {
     public Optional<Variable> findVariable(String name) {
         return Optional.ofNullable(variables.get(name));
     }
+
+    public int getVariableCount() {
+        return variables.size();
+    }
 }

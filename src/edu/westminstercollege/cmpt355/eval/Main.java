@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 public class Main {
 
     public static void main(String... args) throws IOException, SyntaxException {
-        final String EVAL_FILE = "test_programs/hello.eval";
+        final String EVAL_FILE = "test_programs/pythag.eval";
         final String CLASS_NAME = getClassNameFromPath(EVAL_FILE);
 
         System.out.printf("Compiling class %s from %s...\n", CLASS_NAME, EVAL_FILE);

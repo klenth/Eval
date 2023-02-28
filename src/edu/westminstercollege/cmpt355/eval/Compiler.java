@@ -47,8 +47,7 @@ public class Compiler {
                     """, className);
             out.printf(".method public static main([Ljava/lang/String;)V\n");
             out.printf(".limit stack 100\n");
-            out.printf(".limit locals 1\n");
-            //out.printf(".limit locals %d\n", symbols.getVariableCount() * 2 + 1); // + 1 because of args
+            out.printf(".limit locals %d\n", symbols.getVariableCount() * 2 + 1); // + 1 because of args
             out.println();
 
             // Generate code for program here 🙂
@@ -91,8 +90,12 @@ public class Compiler {
                 out.println("getstatic java/lang/System/out Ljava/io/PrintStream;");
                 out.println("invokevirtual java/io/PrintStream/println()V");
             }
-            default ->
-                    throw new RuntimeException(String.format("Unimplemented: %s", statement.getNodeDescription()));
+            case Assignment(String varName, Expression value) -> {
+                // x = ...
+                Variable var = symbols.findVariable(varName).get();
+                generateCode(value); // get the value to be assigned on top of the stack
+                out.printf("dstore %d\n", var.getIndex());
+            }
         }
     }
 
@@ -155,7 +158,18 @@ public class Compiler {
                 out.printf("dload %d\n", v.getIndex());
             }
 
-            // Variable access
+            case Input(List<PrintArgument> args) -> {
+                // Print out the arguments
+                for (var arg : args)
+                    generateCode(arg);
+
+                // Read a double value from the user (???)
+                // Load the value of "in" (the static Scanner variable)
+                out.printf("getstatic %s/in Ljava/util/Scanner;\n", className);
+                // Call the nextDouble() method
+                out.println("invokevirtual java/util/Scanner/nextDouble()D");
+            }
+
             // Input
             default ->
                     throw new RuntimeException(String.format("Unimplemented: %s", expr.getNodeDescription()));
